@@ -3,9 +3,11 @@ import { useUserMedia } from "../hooks/useUserMedia";
 import ReactAudioPlayer from "react-audio-player";
 
 import AudioRecorder from "audio-recorder-polyfill";
-// window.MediaRecorder = AudioRecorder;
+
+if(!window.MediaRecorder) window.MediaRecorder = AudioRecorder;
 
 const constraints = { audio: true, video: false };
+
 function Recorder(props) {
   const { stream, error } = useUserMedia(constraints);
 
@@ -16,20 +18,12 @@ function Recorder(props) {
   console.log({ stream });
   const startListening = () => {
     const newMediaRecorder = new MediaRecorder(stream);
+
+    newMediaRecorder.addEventListener("dataavailable", (e) => {
+      setAudio(URL.createObjectURL(e.data));
+    });
+
     newMediaRecorder.start();
-    let chunks = [];
-    newMediaRecorder.ondataavailable = function (e) {
-      chunks.push(e.data);
-    };
-    newMediaRecorder.onstop = function (e) {
-      const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
-      const audioURL = window.URL.createObjectURL(blob);
-      //   const audio = document.createElement("audio");
-      //   audio.setAttribute("id", "player");
-      //   audio.src = audioURL;
-      //   setAudio(audio);
-      setAudio(audioURL);
-    };
     setMediaRecorder(newMediaRecorder);
   };
 
@@ -37,14 +31,22 @@ function Recorder(props) {
     if (mediaRecorder) mediaRecorder.stop();
   };
 
-  console.log("MediaRecorder", window.MediaRecorder);
+//   console.log("MediaRecorder", window.MediaRecorder);
+//   console.log("error", error);
+//   console.log("stream", stream);
+
   return (
     <div>
-      <button onClick={startListening}>record</button>
-      <button onClick={stop}>stop</button>
-      {audio && (
+      {!error && (
+        <React.Fragment>
+          <button onClick={startListening}>record</button>
+          <button onClick={stop}>stop</button>
+        </React.Fragment>
+      )}
+
+      {true && (
         <ReactAudioPlayer
-          //   controls
+          // controls
           src={audio}
           autoPlay
           // onPlay={(e) => console.log("onPlay", e)}

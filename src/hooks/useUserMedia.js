@@ -1,36 +1,31 @@
 import { useState, useEffect } from "react";
 
-export const useUserMedia = constraints => {
-  const [stream, setStream] = useState(null);
+export function useUserMedia(requestedMedia) {
+  const [mediaStream, setMediaStream] = useState(null);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    if (stream) return;
-    let didCancel = false;
 
-    const getUserMedia = async () => {
-      if (!didCancel) {
-        try {
-          setStream(await navigator.mediaDevices.getUserMedia(constraints));
-        } catch (e) {
-          setError(e);
-        }
+  useEffect(() => {
+    async function enableVideoStream() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(
+          requestedMedia
+        );
+        setMediaStream(stream);
+      } catch (err) {
+        setError(err);
       }
-    };
-    const cancel = () => {
-      didCancel = true;
-      if (!stream) return;
-      if (stream?.getVideoTracks) {
-        stream.getVideoTracks().map(track => track.stop());
-      }
-      if (stream?.getAudioTracks) {
-        stream.getAudioTracks().map(track => track.stop());
-      }
-      if (stream?.stop) {
-        stream.stop();
-      }
-    };
-    getUserMedia();
-    return cancel;
-  }, []);
-  return { stream, error };
-};
+    }
+
+    if (!mediaStream) {
+      enableVideoStream();
+    } else {
+      return function cleanup() {
+        mediaStream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      };
+    }
+  }, [mediaStream, requestedMedia]);
+
+  return { stream: mediaStream, error };
+}
