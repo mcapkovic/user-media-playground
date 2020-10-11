@@ -21,10 +21,7 @@ function Recorder2(props) {
         newMediaRecorder.onstop = (e) => {
           const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
           const audioURL = window.URL.createObjectURL(blob);
-          const audio = document.createElement("audio");
-          audio.setAttribute("id", "player");
-          audio.src = audioURL;
-          setAudio(audio.src);
+          setAudio(audioURL);
           stream.getTracks().forEach((track) => {
             track.stop();
           });
@@ -54,6 +51,7 @@ function Recorder2(props) {
 
   return (
     <div>
+      <h1>Example 2</h1>
       <div>
         advantage:
         <br />- mic is on only during the recording <br />
