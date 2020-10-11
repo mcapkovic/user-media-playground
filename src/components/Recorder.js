@@ -4,14 +4,13 @@ import ReactAudioPlayer from "react-audio-player";
 
 import AudioRecorder from "audio-recorder-polyfill";
 
-if(!window.MediaRecorder) window.MediaRecorder = AudioRecorder;
+if (!window.MediaRecorder) window.MediaRecorder = AudioRecorder;
 
 const constraints = { audio: true, video: false };
 
 function Recorder(props) {
   const { stream, error } = useUserMedia(constraints);
 
-  const [title, setTitle] = React.useState("Record");
   const [mediaRecorder, setMediaRecorder] = React.useState();
   const [audio, setAudio] = React.useState(null);
 
@@ -31,29 +30,33 @@ function Recorder(props) {
     if (mediaRecorder) mediaRecorder.stop();
   };
 
-//   console.log("MediaRecorder", window.MediaRecorder);
-//   console.log("error", error);
-//   console.log("stream", stream);
+  //   console.log("mediaRecorder", mediaRecorder);
 
+  const isRecording =
+    mediaRecorder && mediaRecorder.state === "recording" ? true : false;
   return (
     <div>
+      <ReactAudioPlayer
+        controls
+        src={audio}
+        autoPlay
+        // onPlay={(e) => console.log("onPlay", e)}
+        // onEnded={(e) => console.log("onEnded", e)}
+        // onEnded={onEnded}
+      />
+      <br />
+
       {!error && (
         <React.Fragment>
-          <button onClick={startListening}>record</button>
-          <button onClick={stop}>stop</button>
+          <button disabled={isRecording} onClick={startListening}>
+            start recording
+          </button>
+          <button disabled={!isRecording} onClick={stop}>
+            stop
+          </button>
         </React.Fragment>
       )}
-
-      {true && (
-        <ReactAudioPlayer
-          // controls
-          src={audio}
-          autoPlay
-          // onPlay={(e) => console.log("onPlay", e)}
-          // onEnded={(e) => console.log("onEnded", e)}
-          // onEnded={onEnded}
-        />
-      )}
+      {isRecording ? <div>recording....</div> : <div>not recording</div>}
     </div>
   );
 }
