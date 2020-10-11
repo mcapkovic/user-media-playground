@@ -35,6 +35,7 @@ function Recorder(props) {
     mediaRecorder && mediaRecorder.state === "recording" ? true : false;
   return (
     <div>
+      <h1>Example 1</h1>
       <div>
         disadvantage:
         <br />- microphone is active even if it is not recording
