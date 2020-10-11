@@ -36,16 +36,13 @@ function Recorder(props) {
     mediaRecorder && mediaRecorder.state === "recording" ? true : false;
   return (
     <div>
-      <ReactAudioPlayer
-        controls
-        src={audio}
-        autoPlay
-        // onPlay={(e) => console.log("onPlay", e)}
-        // onEnded={(e) => console.log("onEnded", e)}
-        // onEnded={onEnded}
-      />
-      <br />
+      <div>
+        disadvantage:
+        <br />- microphone is active even if it is not recording
+      </div>
 
+      <ReactAudioPlayer controls src={audio} autoPlay />
+      <br />
       {!error && (
         <React.Fragment>
           <button disabled={isRecording} onClick={startListening}>
@@ -56,7 +53,10 @@ function Recorder(props) {
           </button>
         </React.Fragment>
       )}
-      {isRecording ? <div>recording....</div> : <div>not recording</div>}
+      <div>
+        status:
+        {isRecording ? <span>recording....</span> : <span>not recording</span>}
+      </div>
     </div>
   );
 }
